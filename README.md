@@ -78,3 +78,11 @@ cd emprestimo
 
 # Executar com Maven
 ./mvnw spring-boot:run
+```
+## 📖 Swagger UI
+
+Acesse a documentação interativa da API em:
+
+```bash
+http://localhost:8080/swagger-ui.html
+
