@@ -7,9 +7,9 @@ Sistema simples de gerenciamento de empréstimos consignados, com validação au
 ## 🧱 Estrutura do Projeto
 
 📁 documentacao
- ├── Assinaturas_Integrações.pdf
- ├── EAP.pdf
- └── MER.pdf
+ - Assinaturas_Integrações.pdf
+ - EAP.pdf
+ - MER.pdf
 
 📁 emprestimo
 
