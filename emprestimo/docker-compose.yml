@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgresdb
+    env_file:
+      - .env
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+    ports:
+      - "5434:5432"
+    networks:
+      - library-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Volume para persistência dos dados do PostgreSQL
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadm4
+    env_file:
+      - .env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "15433:80"
+    networks:
+      - library-network
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin  # Volume para persistência das configurações do PgAdmin
+    restart: always
+    depends_on:
+      - postgres
+
+networks:
+  library-network:
+    driver: bridge
+
+volumes:
+  postgres_data: {}  # Definição do volume para o PostgreSQL
+  pgadmin_data: {}  # Definição do volume para o PgAdmin
