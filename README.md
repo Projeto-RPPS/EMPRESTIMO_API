@@ -71,7 +71,7 @@ A documentação completa está disponível na pasta `/documentacao`, incluindo:
 
 ```bash
 # Clonar o projeto
-git clone https://github.com/JoaoM9081/RPPS_Project.git
+git clone https://github.com/Projeto-RPPS/EMPRESTIMO_API.git
 
 # Acessar a pasta
 cd emprestimo
