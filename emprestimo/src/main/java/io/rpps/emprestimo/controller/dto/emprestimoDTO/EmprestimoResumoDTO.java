@@ -11,6 +11,7 @@ public record EmprestimoResumoDTO(
         BigDecimal valorTotal,
         BigDecimal valorParcela,
         Integer quantidadeParcelas,
-        LocalDate dataInicio
+        LocalDate dataInicio,
+        StatusFinanceiro statusFinanceiro
 ) {}
 

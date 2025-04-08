@@ -31,8 +31,9 @@ public class ParcelaController {
     }
 
     @PostMapping("/{idEmprestimo}/parcelas/pagar")
-    public ResponseEntity<PagamentoResponseDTO> pagarParcela(@PathVariable Long idEmprestimo) {
-        String mensagem = service.pagarParcela(idEmprestimo);
+    public ResponseEntity<PagamentoResponseDTO> pagarParcela(@PathVariable Long idEmprestimo,
+                                                             @RequestParam(required = false) Integer numeroParcela) {
+        String mensagem = service.pagarOuAnteciparParcelas(idEmprestimo, numeroParcela);
         return ResponseEntity.ok(new PagamentoResponseDTO(mensagem));
     }
 }

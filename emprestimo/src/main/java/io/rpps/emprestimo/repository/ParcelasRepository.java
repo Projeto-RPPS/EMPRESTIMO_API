@@ -16,10 +16,10 @@ public interface ParcelasRepository extends JpaRepository<Parcela, Long> {
 
     @Query("""
             SELECT p FROM Parcela p
-            WHERE p.emprestimo.id = :idEmprestimo
+            WHERE p.emprestimo.id = ?1
             AND p.paga = false
             ORDER BY p.dataVencimento ASC
             """)
-    List<Parcela> buscarParcelasPendentesOrdenadas(@Param("idEmprestimo") Long idEmprestimo);
+    List<Parcela> buscarParcelasPendentesOrdenadas(Long idEmprestimo);
 
 }

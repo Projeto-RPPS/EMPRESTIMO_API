@@ -57,7 +57,7 @@ public class EmprestimoService {
     }
 
     public List<EmprestimoResumoDTO> consultarEmprestimoPorCpf(String cpfContribuinte) {
-        return repository.findByCpfContribuinte(cpfContribuinte)
+        return repository.consultarEmprestimosPorCpf(cpfContribuinte)
                 .stream()
                 .map(mapper::toResumoDTO)
                 .toList();

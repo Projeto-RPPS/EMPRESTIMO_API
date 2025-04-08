@@ -1,10 +1,8 @@
 package io.rpps.emprestimo.controller.mappers;
 
-import io.rpps.emprestimo.controller.dto.emprestimoDTO.EmprestimoAprovadoDTO;
-import io.rpps.emprestimo.controller.dto.emprestimoDTO.EmprestimoRejeitadoDTO;
-import io.rpps.emprestimo.controller.dto.emprestimoDTO.EmprestimoRequestDTO;
-import io.rpps.emprestimo.controller.dto.emprestimoDTO.EmprestimoResumoDTO;
+import io.rpps.emprestimo.controller.dto.emprestimoDTO.*;
 import io.rpps.emprestimo.model.Emprestimo;
+import io.rpps.emprestimo.model.Parcela;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -27,6 +25,7 @@ public interface EmprestimoMapper {
 
     @Mapping(target = "idEmprestimo", source = "id")
     @Mapping(target = "valorParcela", expression = "java(calcularParcela(emprestimo))")
+    @Mapping(target = "statusFinanceiro", expression = "java(definirStatusFinanceiro(emprestimo))")
     EmprestimoResumoDTO toResumoDTO(Emprestimo emprestimo);
 
     default BigDecimal calcularParcela(Emprestimo emprestimo) {
@@ -35,5 +34,13 @@ public interface EmprestimoMapper {
         }
         return emprestimo.getValorTotal()
                 .divide(BigDecimal.valueOf(emprestimo.getQuantidadeParcelas()), 2, RoundingMode.HALF_UP);
+    }
+
+    default StatusFinanceiro definirStatusFinanceiro(Emprestimo emprestimo) {
+        if (emprestimo.getParcela() == null || emprestimo.getParcela().isEmpty()) {
+            return StatusFinanceiro.PENDENTE;
+        }
+        boolean todasPagas = emprestimo.getParcela().stream().allMatch(Parcela::getPaga);
+        return todasPagas ? StatusFinanceiro.QUITADO : StatusFinanceiro.PENDENTE;
     }
 }
