@@ -7,9 +7,9 @@ Sistema simples de gerenciamento de empréstimos consignados, com validação au
 ## 🧱 Estrutura do Projeto
 
 📁 documentacao
- ├── Assinaturas_Integrações.pdf
- ├── EAP.pdf
- └── MER.pdf
+ - Assinaturas_Integrações.pdf
+ - EAP.pdf
+ - MER.pdf
 
 📁 emprestimo
 
@@ -71,10 +71,18 @@ A documentação completa está disponível na pasta `/documentacao`, incluindo:
 
 ```bash
 # Clonar o projeto
-git clone https://github.com/JoaoM9081/RPPS_Project.git
+git clone https://github.com/Projeto-RPPS/EMPRESTIMO_API.git
 
 # Acessar a pasta
 cd emprestimo
 
 # Executar com Maven
 ./mvnw spring-boot:run
+```
+## 📖 Swagger UI
+
+Acesse a documentação interativa da API em:
+
+```bash
+http://localhost:8080/swagger-ui.html
+
