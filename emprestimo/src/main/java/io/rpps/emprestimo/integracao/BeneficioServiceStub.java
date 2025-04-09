@@ -10,6 +10,6 @@ public class BeneficioServiceStub implements BeneficioServiceGateway{
 
     @Override
     public BeneficioDTO getBeneficio(String cpfContribuinte) {
-        return new BeneficioDTO(cpfContribuinte, BigDecimal.valueOf(2000), "ATIVO");
+        return new BeneficioDTO(BigDecimal.valueOf(2000), "ATIVO");
     }
 }

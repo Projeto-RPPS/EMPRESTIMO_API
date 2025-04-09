@@ -5,6 +5,7 @@ import io.rpps.emprestimo.integracao.BeneficioServiceGateway;
 import io.rpps.emprestimo.model.Parcela;
 import io.rpps.emprestimo.model.StatusEmprestimo;
 import io.rpps.emprestimo.repository.ParcelasRepository;
+import io.rpps.emprestimo.validator.BeneficioValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +17,11 @@ public class MargemConsignavelService {
 
     private final BeneficioServiceGateway beneficioService;
     private final ParcelasRepository parcelasRepository;
+    private final BeneficioValidator validator;
 
     public MargemConsignavelDTO calcularMargem(String cpfContribuinte){
         var beneficio = beneficioService.getBeneficio(cpfContribuinte);
+        validator.validarBeneficioAtivo(beneficio);
         BigDecimal margemTotal = beneficio.valor().multiply(BigDecimal.valueOf(0.3));
 
         BigDecimal valorEmUso = parcelasRepository
@@ -32,7 +35,6 @@ public class MargemConsignavelService {
         BigDecimal margemDisponivel = margemTotal.subtract(valorEmUso);
 
         return new MargemConsignavelDTO(
-                cpfContribuinte,
                 beneficio.valor(),
                 margemTotal,
                 valorEmUso,

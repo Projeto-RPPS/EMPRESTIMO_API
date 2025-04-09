@@ -1,6 +1,6 @@
 package io.rpps.emprestimo.controller.mappers;
 
-import io.rpps.emprestimo.controller.dto.emprestimoDTO.*;
+import io.rpps.emprestimo.controller.dto.emprestimo.*;
 import io.rpps.emprestimo.model.Emprestimo;
 import io.rpps.emprestimo.model.Parcela;
 import org.mapstruct.Mapper;

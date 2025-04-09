@@ -1,4 +1,4 @@
-package io.rpps.emprestimo.controller.dto.emprestimoDTO;
+package io.rpps.emprestimo.controller.dto.emprestimo;
 
 import io.rpps.emprestimo.model.StatusEmprestimo;
 

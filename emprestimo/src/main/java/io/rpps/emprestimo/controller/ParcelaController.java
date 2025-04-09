@@ -1,7 +1,7 @@
 package io.rpps.emprestimo.controller;
 
-import io.rpps.emprestimo.controller.dto.parcelasDTO.PagamentoResponseDTO;
-import io.rpps.emprestimo.controller.dto.parcelasDTO.ParcelaDTO;
+import io.rpps.emprestimo.controller.dto.parcelas.PagamentoResponseDTO;
+import io.rpps.emprestimo.controller.dto.parcelas.ParcelaDTO;
 import io.rpps.emprestimo.controller.mappers.ParcelaMapper;
 import io.rpps.emprestimo.model.Parcela;
 import io.rpps.emprestimo.service.ParcelaService;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor

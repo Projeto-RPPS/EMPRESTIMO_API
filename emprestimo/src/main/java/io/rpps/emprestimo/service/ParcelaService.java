@@ -3,12 +3,10 @@ package io.rpps.emprestimo.service;
 import io.rpps.emprestimo.model.Emprestimo;
 import io.rpps.emprestimo.model.Parcela;
 import io.rpps.emprestimo.repository.ParcelasRepository;
-import io.rpps.emprestimo.validator.ParcelaValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.beans.Transient;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -18,7 +16,6 @@ import java.util.List;
 public class ParcelaService {
 
     private final ParcelasRepository repository;
-    private final ParcelaValidator validator;
 
     public void gerarParcelas(Emprestimo emprestimo, BigDecimal valorParcela){
         for(int i = 1; i <= emprestimo.getQuantidadeParcelas(); i++){
@@ -57,11 +54,13 @@ public class ParcelaService {
         }
 
         // Pega a próxima parcela pendente
-        Parcela proxima = pendentes.get(0);
+        Parcela proxima = pendentes.getFirst();
 
         // Verifica se a próxima parcela está vencida
         if (proxima.getDataVencimento().isAfter(LocalDate.now())) {
-            return "A próxima parcela vence em " + proxima.getDataVencimento() + ". Nenhuma parcela em atraso para pagamento.";
+            return "A próxima parcela vence em " +
+                    proxima.getDataVencimento() +
+                    ". Nenhuma parcela em atraso para pagamento.";
         }
 
         // Marca a parcela como paga

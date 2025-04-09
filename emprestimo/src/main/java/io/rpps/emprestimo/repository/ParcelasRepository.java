@@ -12,8 +12,6 @@ public interface ParcelasRepository extends JpaRepository<Parcela, Long> {
 
     List<Parcela> findByEmprestimoId(Long idEmprestimo);
 
-    Optional<Parcela> findByEmprestimoIdAndNumeroParcela(Long idEmprestimo, Integer numeroParcela);
-
     @Query("""
             SELECT p FROM Parcela p
             WHERE p.emprestimo.id = ?1

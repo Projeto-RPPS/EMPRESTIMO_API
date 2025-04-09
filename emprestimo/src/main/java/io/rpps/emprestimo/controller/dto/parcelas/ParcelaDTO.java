@@ -1,4 +1,4 @@
-package io.rpps.emprestimo.controller.dto.parcelasDTO;
+package io.rpps.emprestimo.controller.dto.parcelas;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

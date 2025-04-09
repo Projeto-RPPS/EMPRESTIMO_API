@@ -31,8 +31,6 @@ public class DatabaseConfiguration {
         config.setPassword(password);
         config.setDriverClassName(driver);
 
-        config.setConnectionTestQuery("select 1");
-
         return new HikariDataSource(config);
     }
 }
