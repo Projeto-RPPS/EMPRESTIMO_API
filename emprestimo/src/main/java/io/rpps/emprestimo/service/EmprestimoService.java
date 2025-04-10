@@ -49,11 +49,16 @@ public class EmprestimoService {
         }
     }
 
-    public List<EmprestimoResumoDTO> consultarEmprestimoPorCpf(String cpfContribuinte) {
-        return repository.consultarEmprestimosPorCpf(cpfContribuinte)
-                .stream()
-                .map(mapper::toResumoDTO)
-                .toList();
+    public List<Emprestimo> consultarEmprestimoPorCpf(String cpfContribuinte) {
+        // Retorna todos os empréstimos aprovados para o CPF
+        List<Emprestimo> emprestimos = repository.consultarPorCpf(cpfContribuinte);
+
+        // Se não encontrar nenhum empréstimo aprovado, lançar exceção
+        if (emprestimos.isEmpty()) {
+            throw new IllegalArgumentException("Empréstimos não encontrados para este CPF");
+        }
+
+        return emprestimos;
     }
 
     public SimularEmprestimoDTO simularEmprestimo(EmprestimoRequestDTO dto) {

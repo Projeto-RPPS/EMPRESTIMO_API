@@ -28,6 +28,12 @@ public class GlobalExceptionHandler {
         return new ErroResposta(HttpStatus.UNPROCESSABLE_ENTITY.value(), "Erro de validação", listErros);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErroResposta handleIllegalArgumentException(IllegalArgumentException e) {
+        return ErroResposta.CampoInvalido(e.getMessage());
+    }
+
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErroResposta handleRuntimeException(RuntimeException e) {

@@ -1,6 +1,10 @@
 package io.rpps.emprestimo.controller;
 
 import io.rpps.emprestimo.controller.dto.emprestimo.*;
+import io.rpps.emprestimo.controller.dto.erros.ErroCampo;
+import io.rpps.emprestimo.controller.dto.erros.ErroResposta;
+import io.rpps.emprestimo.controller.mappers.EmprestimoMapper;
+import io.rpps.emprestimo.model.Emprestimo;
 import io.rpps.emprestimo.service.EmprestimoService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -20,6 +25,7 @@ import java.util.List;
 public class EmprestimoController {
 
     private final EmprestimoService service;
+    private final EmprestimoMapper mapper;
 
     @PostMapping
     @ApiResponses(value = {
@@ -47,10 +53,14 @@ public class EmprestimoController {
     }
 
     @GetMapping("/{cpfContribuinte}")
-    public ResponseEntity<List<EmprestimoResumoDTO>> consultarEmprestimosPorCpf(
-            @PathVariable String cpfContribuinte){
-        List<EmprestimoResumoDTO> response = service.consultarEmprestimoPorCpf(cpfContribuinte);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<EmprestimoResumoDTO>> consultarEmprestimosPorCpf(@PathVariable String cpfContribuinte) {
+        List<Emprestimo> response = service.consultarEmprestimoPorCpf(cpfContribuinte);
+
+        // Retorna a lista de empréstimos com status 200
+        return ResponseEntity.ok(response
+                .stream()
+                .map(mapper::toResumoDTO)
+                .toList());
     }
 
     @PostMapping("/simulacao")

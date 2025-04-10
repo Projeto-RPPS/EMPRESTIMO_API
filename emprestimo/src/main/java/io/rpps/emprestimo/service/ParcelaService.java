@@ -2,6 +2,7 @@ package io.rpps.emprestimo.service;
 
 import io.rpps.emprestimo.model.Emprestimo;
 import io.rpps.emprestimo.model.Parcela;
+import io.rpps.emprestimo.repository.EmprestimoRepository;
 import io.rpps.emprestimo.repository.ParcelasRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 public class ParcelaService {
 
     private final ParcelasRepository repository;
+    private final EmprestimoRepository emprestimoRepository;
 
     public void gerarParcelas(Emprestimo emprestimo, BigDecimal valorParcela){
         for(int i = 1; i <= emprestimo.getQuantidadeParcelas(); i++){
@@ -30,13 +32,23 @@ public class ParcelaService {
     }
 
     public List<Parcela> buscarPorEmprestimo(Long idEmprestimo){
-        return repository.findByEmprestimoId(idEmprestimo);
-
+        Emprestimo emprestimo = emprestimoRepository.findById(idEmprestimo)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Empréstimo não encontrado com este ID"));
+        return repository.findByEmprestimoId(emprestimo.getId());
     }
 
     @Transactional
     public String pagarOuAnteciparParcelas(Long idEmprestimo, Integer numeroParcelas) {
         // Se não foi fornecido o número de parcelas, pagamos a próxima
+        Emprestimo emprestimo = emprestimoRepository.findById(idEmprestimo)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Empréstimo não encontrado com este ID"));
+
+        if (numeroParcelas != null && numeroParcelas <= 0) {
+            throw new IllegalArgumentException("Número de parcelas deve ser maior que zero.");
+        }
+
         if (numeroParcelas == null) {
             return pagarParcela(idEmprestimo);
         }
@@ -50,7 +62,7 @@ public class ParcelaService {
         List<Parcela> pendentes = repository.buscarParcelasPendentesOrdenadas(idEmprestimo);
 
         if (pendentes.isEmpty()) {
-            return "Todas as parcelas deste empréstimo já foram pagas.";
+            return "Todas as parcelas já foram pagas.";
         }
 
         // Pega a próxima parcela pendente

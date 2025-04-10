@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EmprestimoRepository extends JpaRepository<Emprestimo, Long> {
 
@@ -14,5 +15,5 @@ public interface EmprestimoRepository extends JpaRepository<Emprestimo, Long> {
               WHERE e.cpfContribuinte = ?1
               AND e.status = 'APROVADO'
               """)
-    List<Emprestimo> consultarEmprestimosPorCpf(String cpfContribuinte);
+    List<Emprestimo> consultarPorCpf(String cpfContribuinte);
 }
