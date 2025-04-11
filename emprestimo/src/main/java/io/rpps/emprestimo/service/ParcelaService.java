@@ -71,8 +71,8 @@ public class ParcelaService {
         // Verifica se a próxima parcela está vencida
         if (proxima.getDataVencimento().isAfter(LocalDate.now())) {
             return "A próxima parcela vence em " +
-                    proxima.getDataVencimento() +
-                    ". Nenhuma parcela em atraso para pagamento.";
+                    proxima.getDataVencimento() + ". " +
+                    "Pagamento disponível somente após o vencimento.";
         }
 
         // Marca a parcela como paga

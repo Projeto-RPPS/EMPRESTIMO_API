@@ -9,8 +9,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
     ports:
       - "5434:5432"
-    networks:
-      - library-network
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Volume para persistência dos dados do PostgreSQL
     restart: always
@@ -25,17 +23,11 @@ services:
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
       - "15433:80"
-    networks:
-      - library-network
     volumes:
       - pgadmin_data:/var/lib/pgadmin  # Volume para persistência das configurações do PgAdmin
     restart: always
     depends_on:
       - postgres
-
-networks:
-  library-network:
-    driver: bridge
 
 volumes:
   postgres_data: {}  # Definição do volume para o PostgreSQL
