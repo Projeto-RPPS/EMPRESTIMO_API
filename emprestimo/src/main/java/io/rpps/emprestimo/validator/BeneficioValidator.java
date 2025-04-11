@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 public class BeneficioValidator {
 
     public void validarBeneficioAtivo(BeneficioDTO beneficio) {
-        if (!"ATIVO".equalsIgnoreCase(beneficio.status())) {
+        if (!"concedido".equalsIgnoreCase(beneficio.status())) {
             throw new IllegalStateException("Benefício inativo");
         }
     }

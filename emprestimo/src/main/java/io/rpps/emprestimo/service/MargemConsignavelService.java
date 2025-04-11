@@ -22,7 +22,7 @@ public class MargemConsignavelService {
     public MargemConsignavelDTO calcularMargem(String cpfContribuinte){
         var beneficio = beneficioService.getBeneficio(cpfContribuinte);
         validator.validarBeneficioAtivo(beneficio);
-        BigDecimal margemTotal = beneficio.valor().multiply(BigDecimal.valueOf(0.3));
+        BigDecimal margemTotal = beneficio.totalBeneficios().multiply(BigDecimal.valueOf(0.3));
 
         BigDecimal valorEmUso = parcelasRepository
                 .findAll()
@@ -35,7 +35,7 @@ public class MargemConsignavelService {
         BigDecimal margemDisponivel = margemTotal.subtract(valorEmUso);
 
         return new MargemConsignavelDTO(
-                beneficio.valor(),
+                beneficio.totalBeneficios(),
                 margemTotal,
                 valorEmUso,
                 margemDisponivel
