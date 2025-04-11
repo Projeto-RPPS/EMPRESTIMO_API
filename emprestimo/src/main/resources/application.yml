@@ -1,6 +1,6 @@
 spring:
   application:
-    name: emprestimo
+    name: ${APP_NAME}
   datasource:
     url: ${DB_URL}
     username: ${DB_USER}
@@ -8,3 +8,6 @@ spring:
     driver-class-name: org.postgresql.Driver
   config:
     import: optional:file:.env[.properties]
+
+server:
+  port: ${SERVER_PORT}
