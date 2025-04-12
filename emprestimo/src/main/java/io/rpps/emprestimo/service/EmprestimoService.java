@@ -7,6 +7,7 @@ import io.rpps.emprestimo.controller.mappers.EmprestimoMapper;
 import io.rpps.emprestimo.model.Emprestimo;
 import io.rpps.emprestimo.model.StatusEmprestimo;
 import io.rpps.emprestimo.repository.EmprestimoRepository;
+import io.rpps.emprestimo.validator.BeneficioValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class EmprestimoService {
     private final EmprestimoMapper mapper;
     private final ParcelaService parcelaService;
     private final MargemConsignavelService margemConsignavelService;
+    private final BeneficioValidator validator;
 
     private BigDecimal calcularNovaParcela(BigDecimal valorTotal, Integer quantidadeParcelas){
         return valorTotal.divide(
@@ -50,6 +52,7 @@ public class EmprestimoService {
     }
 
     public List<Emprestimo> consultarEmprestimoPorCpf(String cpfContribuinte) {
+        validator.validarCpf(cpfContribuinte);
         // Retorna todos os empréstimos aprovados para o CPF
         List<Emprestimo> emprestimos = repository.consultarPorCpf(cpfContribuinte);
 

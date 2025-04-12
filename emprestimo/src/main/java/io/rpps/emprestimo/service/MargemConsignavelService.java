@@ -20,6 +20,7 @@ public class MargemConsignavelService {
     private final BeneficioValidator validator;
 
     public MargemConsignavelDTO calcularMargem(String cpfContribuinte){
+        validator.validarCpf(cpfContribuinte);
         var beneficio = beneficioService.getBeneficio(cpfContribuinte);
         validator.validarBeneficioAtivo(beneficio);
         BigDecimal margemTotal = beneficio.totalBeneficios().multiply(BigDecimal.valueOf(0.3));
