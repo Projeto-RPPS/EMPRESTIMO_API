@@ -41,7 +41,7 @@ public class ParcelaService {
     @Transactional
     public String pagarOuAnteciparParcelas(Long idEmprestimo, Integer numeroParcelas) {
         // Se não foi fornecido o número de parcelas, pagamos a próxima
-        Emprestimo emprestimo = emprestimoRepository.findById(idEmprestimo)
+        emprestimoRepository.findById(idEmprestimo)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Empréstimo não encontrado com este ID"));
 
@@ -61,25 +61,21 @@ public class ParcelaService {
         // Buscar as parcelas pendentes ordenadas pela data de vencimento
         List<Parcela> pendentes = repository.buscarParcelasPendentesOrdenadas(idEmprestimo);
 
-        if (pendentes.isEmpty()) {
-            return "Todas as parcelas já foram pagas.";
-        }
+        LocalDate hoje = LocalDate.now();
+        int mesAtual = hoje.getMonthValue();
+        int anoAtual = hoje.getYear();
 
-        // Pega a próxima parcela pendente
-        Parcela proxima = pendentes.getFirst();
+        Parcela parcelaDoMes = pendentes.stream()
+            .filter(p -> p.getDataVencimento().getMonthValue() == mesAtual &&
+                         p.getDataVencimento().getYear() == anoAtual)
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Nenhuma parcela disponível para pagamento neste mês."));
 
-        // Verifica se a próxima parcela está vencida
-        if (proxima.getDataVencimento().isAfter(LocalDate.now())) {
-            return "A próxima parcela vence em " +
-                    proxima.getDataVencimento() + ". " +
-                    "Pagamento disponível somente após o vencimento.";
-        }
+        parcelaDoMes.setPaga(true);
+        repository.save(parcelaDoMes);
 
-        // Marca a parcela como paga
-        proxima.setPaga(true);
-        repository.save(proxima);
-
-        return "Parcela com vencimento em " + proxima.getDataVencimento() + " paga com sucesso.";
+        return "Parcela com vencimento em " + parcelaDoMes.getDataVencimento() + " paga com sucesso.";
     }
 
     private String anteciparParcelas(Long idEmprestimo, Integer numeroParcelas) {
@@ -87,24 +83,19 @@ public class ParcelaService {
 
         // Verifica se o número de parcelas a ser antecipado é válido
         if (pendentes.size() < numeroParcelas) {
-            return "Não há parcelas suficientes para antecipar.";
+            throw new IllegalArgumentException("Não há parcelas suficientes para antecipar.");
         }
 
         BigDecimal totalPago = BigDecimal.ZERO;
         for (int i = 0; i < numeroParcelas; i++) {
             Parcela parcela = pendentes.get(i);
 
-            // Verifica se a parcela já foi paga, e se sim, pula para a próxima
             if (parcela.getPaga()) {
                 continue;
             }
 
-            // Marca a parcela como paga
             parcela.setPaga(true);
             totalPago = totalPago.add(parcela.getValor());
-
-            // Atualiza a data de vencimento para a data atual (indicando que foi antecipada)
-            parcela.setDataVencimento(LocalDate.now());
 
             repository.save(parcela);
         }

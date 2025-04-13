@@ -11,3 +11,7 @@ spring:
 
 server:
   port: ${SERVER_PORT}
+
+beneficios:
+  api:
+    base-url: http://host.docker.internal:8080 # URL do serviço de benefícios
