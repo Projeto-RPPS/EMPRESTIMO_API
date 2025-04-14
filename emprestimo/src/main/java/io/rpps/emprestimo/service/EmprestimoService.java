@@ -31,10 +31,20 @@ public class EmprestimoService {
                 BigDecimal.valueOf(quantidadeParcelas), 2, RoundingMode.HALF_UP);
     }
 
+    private BigDecimal aplicarJuros(BigDecimal valorPrincipal, int quantidadeParcelas) {
+        BigDecimal taxaJurosMensal = new BigDecimal("0.05"); // 5% ao mês
+        BigDecimal jurosTotais = valorPrincipal
+                .multiply(taxaJurosMensal)
+                .multiply(BigDecimal.valueOf(quantidadeParcelas));
+
+        return valorPrincipal.add(jurosTotais);
+    }
+
     public Object criarEmprestimo(EmprestimoRequestDTO dto) {
         var margem = margemConsignavelService.calcularMargem(dto.cpfContribuinte());
 
-        BigDecimal novaParcela = calcularNovaParcela(dto.valorTotal(), dto.quantidadeParcelas());
+        BigDecimal valorComJuros = aplicarJuros(dto.valorTotal(), dto.quantidadeParcelas());
+        BigDecimal novaParcela = calcularNovaParcela(valorComJuros, dto.quantidadeParcelas());
 
         Emprestimo emprestimo = mapper.toEntity(dto);
         emprestimo.setDataInicio(LocalDate.now());
@@ -67,7 +77,8 @@ public class EmprestimoService {
     public SimularEmprestimoDTO simularEmprestimo(EmprestimoRequestDTO dto) {
         var margem = margemConsignavelService.calcularMargem(dto.cpfContribuinte());
 
-        BigDecimal novaParcela = calcularNovaParcela(dto.valorTotal(), dto.quantidadeParcelas());
+        BigDecimal valorComJuros = aplicarJuros(dto.valorTotal(), dto.quantidadeParcelas());
+        BigDecimal novaParcela = calcularNovaParcela(valorComJuros, dto.quantidadeParcelas());
 
         boolean aprovado = margem.valorEmUso().add(novaParcela).compareTo(margem.margemTotal()) <= 0;
 
