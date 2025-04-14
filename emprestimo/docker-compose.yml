@@ -44,7 +44,7 @@ services:
 
   api:
     build:
-      context: .  # Onde está seu Dockerfile e projeto
+      context: . 
     container_name: emprestimo_api
     ports:
       - "8085:8085"
