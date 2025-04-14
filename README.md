@@ -12,12 +12,13 @@ Sistema simples de gerenciamento de empréstimos consignados, com validação au
  - MER.pdf
 
 📁 emprestimo
+- Código Fonte API
 
 ---
 
 ## 🚀 Tecnologias Utilizadas
 
-- Java 23
+- Java 21
 - Spring Boot 3.4.3
 - Spring Data JPA
 - PostgreSQL
@@ -48,7 +49,7 @@ Sistema simples de gerenciamento de empréstimos consignados, com validação au
   Lista todas as parcelas de um empréstimo.
 
 - **POST /emprestimos/{idEmprestimo}/parcelas/pagar**  
-  Realiza o pagamento da próxima parcela pendente.
+  Realiza o pagamento da próxima parcela pendente ou antecipa parcelas.
 
 ### 📌 Margem Consignável
 
@@ -57,32 +58,64 @@ Sistema simples de gerenciamento de empréstimos consignados, com validação au
 
 ---
 
-## 📂 Documentação
+## ⚙️ Variáveis de Ambiente (.env)
 
-A documentação completa está disponível na pasta `/documentacao`, incluindo:
+```bash
+# PostgreSQL Configuration
+POSTGRES_PASSWORD=your_postgres_password
+POSTGRES_USER=your_postgres_user
+POSTGRES_DB=your_database_name
 
-- 🧾 Assinaturas de integração (endpoints, formatos de entrada/saída)
-- 🧱 EAP (Estrutura Analítica do Projeto)
-- 🧠 Modelo Entidade-Relacionamento (MER)
+# PgAdmin Configuration
+PGADMIN_DEFAULT_EMAIL=your_pgadmin_email@example.com
+PGADMIN_DEFAULT_PASSWORD=your_pgadmin_password
+
+# Application Database Connection
+DB_URL=jdbc:postgresql://your_postgres_host:5432/your_database_name
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+
+# Application Info
+APP_NAME=your_app_name
+SERVER_PORT=your_app_port
+```
 
 ---
 
-## 🔧 Executando o Projeto
+## 🐳 Executando o Projeto
 
+### 1. Clonar o repositório
 ```bash
-# Clonar o projeto
 git clone https://github.com/Projeto-RPPS/EMPRESTIMO_API.git
-
-# Acessar a pasta
-cd emprestimo
-
-# Executar com Maven
-./mvnw spring-boot:run
 ```
+### 2. Acessar o diretório do projeto
+
+``` bash
+cd emprestimo
+```
+
+### 3. Subir os serviços com Docker Compose
+
+``` bash
+docker-compose up -d --build
+```
+#### Serviços incluídos:
+
+- postgresdb — Banco de dados PostgreSQL (porta 5432)
+
+- pgadmin — Interface para gerenciar o banco (acessível em http://localhost:15434)
+
+- emprestimo_api — API do projeto (acessível em http://localhost:8085)
+
 ## 📖 Swagger UI
 
 Acesse a documentação interativa da API em:
 
 ```bash
-http://localhost:8080/swagger-ui.html
+http://localhost:8085/swagger-ui.html
+```
 
+## 🧪 Testes e Validações
+- Testes podem ser realizados via Postman ou diretamente pelo Swagger.
+- As validações de entrada usam @Valid com mensagens personalizadas.
+- Retorno de erros é tratado por um @ControllerAdvice.
