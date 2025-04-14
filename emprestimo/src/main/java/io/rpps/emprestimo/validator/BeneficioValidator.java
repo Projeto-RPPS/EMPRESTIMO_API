@@ -8,7 +8,7 @@ public class BeneficioValidator {
 
     public void validarBeneficioAtivo(BeneficioDTO beneficio) {
         if (!"concedido".equalsIgnoreCase(beneficio.status())) {
-            throw new IllegalStateException("Benefício não foi concedido.");
+            throw new IllegalArgumentException("Benefício não foi concedido.");
         }
     }
 
