@@ -45,7 +45,7 @@ services:
   api:
     build:
       context: . 
-    container_name: emprestimo_api
+    container_name: emprestimo-api
     ports:
       - "8085:8085"
     env_file:
