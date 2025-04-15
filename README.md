@@ -19,7 +19,7 @@ Sistema simples de gerenciamento de empréstimos consignados, com validação au
 ## 🚀 Tecnologias Utilizadas
 
 - Java 21
-- Spring Boot 3.4.3
+- Spring Boot 3.4+
 - Spring Data JPA
 - PostgreSQL
 - Lombok
