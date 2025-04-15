@@ -27,6 +27,7 @@ Sistema simples de gerenciamento de empréstimos consignados, com validação au
 - Springdoc OpenAPI + Swagger UI
 - Hibernate Utils
 - Bean Validation
+- Flyway
 
 ---
 
@@ -93,8 +94,13 @@ git clone https://github.com/Projeto-RPPS/EMPRESTIMO_API.git
 ``` bash
 cd emprestimo
 ```
+### 3. Criando Network
 
-### 3. Subir os serviços com Docker Compose
+``` bash
+docker network create shared_network
+```
+
+### 4. Subir os serviços com Docker Compose
 
 ``` bash
 docker-compose up -d --build
@@ -115,7 +121,7 @@ Acesse a documentação interativa da API em:
 http://localhost:8085/swagger-ui.html
 ```
 
-## 🧪 Testes e Validações
+## 👁️‍🗨️ Testes e Validações
 - Testes podem ser realizados via Postman ou diretamente pelo Swagger.
 - As validações de entrada usam @Valid com mensagens personalizadas.
 - Retorno de erros é tratado por um @ControllerAdvice.
