@@ -8,6 +8,15 @@ spring:
     driver-class-name: org.postgresql.Driver
   config:
     import: optional:file:.env[.properties]
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+logging:
+  level:
+    org:
+      flywaydb: DEBUG
 
 server:
   port: ${SERVER_PORT}

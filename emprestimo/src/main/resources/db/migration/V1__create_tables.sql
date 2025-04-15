@@ -1,4 +1,3 @@
--- Tabela de Empréstimos com BIGINT auto-incrementável
 CREATE TABLE emprestimo (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     cpf_contribuinte VARCHAR(11) NOT NULL,
@@ -11,7 +10,6 @@ CREATE TABLE emprestimo (
     )
 );
 
--- Tabela de Parcelas do Empréstimo com BIGINT auto-incrementável
 CREATE TABLE parcela (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_emprestimo BIGINT NOT NULL,
