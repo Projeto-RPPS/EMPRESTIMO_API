@@ -57,7 +57,7 @@ services:
       - shared_network
     environment:
       DB_URL: ${DB_URL}
-      DB_USERNAME: ${DB_USER}
+      DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       APP_NAME: ${APP_NAME}
       SERVER_PORT: ${SERVER_PORT}
