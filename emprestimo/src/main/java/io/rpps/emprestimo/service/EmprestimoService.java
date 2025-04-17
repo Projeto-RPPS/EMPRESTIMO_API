@@ -63,10 +63,9 @@ public class EmprestimoService {
 
     public List<Emprestimo> consultarEmprestimoPorCpf(String cpfContribuinte) {
         validator.validarCpf(cpfContribuinte);
-        // Retorna todos os empréstimos aprovados para o CPF
+
         List<Emprestimo> emprestimos = repository.consultarPorCpf(cpfContribuinte);
 
-        // Se não encontrar nenhum empréstimo aprovado, lançar exceção
         if (emprestimos.isEmpty()) {
             throw new IllegalArgumentException("Empréstimos não encontrados para este CPF");
         }
@@ -82,6 +81,6 @@ public class EmprestimoService {
 
         boolean aprovado = margem.valorEmUso().add(novaParcela).compareTo(margem.margemTotal()) <= 0;
 
-        return new SimularEmprestimoDTO(aprovado, margem.margemDisponivel());
+        return new SimularEmprestimoDTO(aprovado, margem.margemDisponivel(), novaParcela);
     }
 }

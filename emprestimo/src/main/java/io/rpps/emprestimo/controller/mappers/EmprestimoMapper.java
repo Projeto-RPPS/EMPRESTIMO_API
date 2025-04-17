@@ -32,8 +32,14 @@ public interface EmprestimoMapper {
         if (emprestimo.getQuantidadeParcelas() == null || emprestimo.getQuantidadeParcelas() == 0) {
             return BigDecimal.ZERO;
         }
-        return emprestimo.getValorTotal()
-                .divide(BigDecimal.valueOf(emprestimo.getQuantidadeParcelas()), 2, RoundingMode.HALF_UP);
+
+        BigDecimal juros = emprestimo.getValorTotal().multiply(BigDecimal.valueOf(0.05));
+        BigDecimal jurosTotal = juros.multiply(BigDecimal.valueOf(emprestimo.getQuantidadeParcelas()));
+        BigDecimal valorTotalComJuros = emprestimo.getValorTotal().add(jurosTotal);
+        BigDecimal valorParcela = valorTotalComJuros.divide(BigDecimal.valueOf(
+                emprestimo.getQuantidadeParcelas()), 2, RoundingMode.HALF_UP);
+
+        return valorParcela.setScale(2, RoundingMode.HALF_UP);
     }
 
     default StatusFinanceiro definirStatusFinanceiro(Emprestimo emprestimo) {

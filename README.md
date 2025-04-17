@@ -38,19 +38,31 @@ Sistema simples de gerenciamento de empréstimos consignados, com validação au
 - **POST /emprestimos**  
   Criação de empréstimo com cálculo e validação automática da margem consignável.
 
+
 - **GET /emprestimos/{cpfContribuinte}**  
   Lista todos os empréstimos associados a um determinado contribuinte.
+
 
 - **POST /emprestimos/simulacao**  
   Simulação de empréstimo sem persistência no banco.
 
+
 ### 📌 Parcelas
 
 - **GET /emprestimos/{idEmprestimo}/parcelas**  
-  Lista todas as parcelas de um empréstimo.
+  Lista todas as parcelas de um empréstimo (pagas e pendentes).
+
+
+- **GET /emprestimos/{idEmprestimo}/parcelas/proximaPendente**  
+  Retorna **apenas a próxima** parcela em aberto, mas com o campo `valor` já ajustado para incluir todas as parcelas atrasadas (com juros diários de 1%) **mais** o valor da parcela atual sem juros.
+
 
 - **POST /emprestimos/{idEmprestimo}/parcelas/pagar**  
-  Realiza o pagamento da próxima parcela pendente ou antecipa parcelas.
+  Quita **todas as parcelas vencidas** (aplicando juros de 1% ao dia) e a próxima parcela não paga, marcando-as como pagas.
+
+
+- **POST /emprestimos/{idEmprestimo}/parcelas/antecipar**  
+  Antecipação de N parcelas **somente se não houver nenhuma parcela vencida**. Caso existam atrasos, retorna erro informando que é preciso pagar primeiro as parcelas em atraso.
 
 ### 📌 Margem Consignável
 

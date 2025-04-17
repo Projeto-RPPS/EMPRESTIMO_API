@@ -1,5 +1,6 @@
 package io.rpps.emprestimo.service;
 
+import io.rpps.emprestimo.controller.dto.parcelas.ParcelaDTO;
 import io.rpps.emprestimo.model.Emprestimo;
 import io.rpps.emprestimo.model.Parcela;
 import io.rpps.emprestimo.repository.EmprestimoRepository;
@@ -9,8 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +23,15 @@ public class ParcelaService {
 
     private final ParcelasRepository repository;
     private final EmprestimoRepository emprestimoRepository;
+    private static final BigDecimal TAXA_JUROS_DIARIA = BigDecimal.valueOf(0.01);
 
-    public void gerarParcelas(Emprestimo emprestimo, BigDecimal valorParcela){
-        for(int i = 1; i <= emprestimo.getQuantidadeParcelas(); i++){
+    public void gerarParcelas(Emprestimo emprestimo, BigDecimal valorParcela) {
+        BigDecimal valorArredondado = valorParcela.setScale(2, RoundingMode.HALF_UP);
+        for (int i = 1; i <= emprestimo.getQuantidadeParcelas(); i++) {
             Parcela parcela = new Parcela();
             parcela.setNumeroParcela(i);
             parcela.setDataVencimento(emprestimo.getDataInicio().plusMonths(i));
-            parcela.setValor(valorParcela);
+            parcela.setValor(valorArredondado);
             parcela.setPaga(false);
             parcela.setEmprestimo(emprestimo);
             repository.save(parcela);
@@ -38,68 +45,109 @@ public class ParcelaService {
         return repository.findByEmprestimoId(emprestimo.getId());
     }
 
-    @Transactional
-    public String pagarOuAnteciparParcelas(Long idEmprestimo, Integer numeroParcelas) {
-        // Se não foi fornecido o número de parcelas, pagamos a próxima
-        emprestimoRepository.findById(idEmprestimo)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Empréstimo não encontrado com este ID"));
+    private record PagamentoInfo(List<Parcela> parcelas, Parcela proxima, BigDecimal total) {}
 
-        if (numeroParcelas != null && numeroParcelas <= 0) {
-            throw new IllegalArgumentException("Número de parcelas deve ser maior que zero.");
+    private PagamentoInfo calcularDadosPagamentoAcumulado(Long idEmprestimo) {
+        LocalDate hoje = LocalDate.now();
+        List<Parcela> pendentes = repository.buscarParcelasPendentesOrdenadas(idEmprestimo);
+        if (pendentes.isEmpty()){
+            throw new IllegalArgumentException("Não há parcelas pendentes para este empréstimo.");
         }
 
-        if (numeroParcelas == null) {
-            return pagarParcela(idEmprestimo);
-        }
+        List<Parcela> vencidas = pendentes.stream()
+                .filter(p -> p.getDataVencimento().isBefore(hoje))
+                .toList();
 
-        // Caso contrário, fazemos a antecipação das parcelas
-        return anteciparParcelas(idEmprestimo, numeroParcelas);
+        Parcela proxima = vencidas.isEmpty()
+                ? pendentes.getFirst()
+                : pendentes.get(vencidas.size());
+
+        List<Parcela> aPagar = Stream.concat(vencidas.stream(), Stream.of(proxima))
+                .collect(Collectors.toList());
+
+        BigDecimal total = aPagar.stream()
+                .map(p -> p.equals(proxima)
+                        ? p.getValor().setScale(2, RoundingMode.HALF_UP)
+                        : calcularValorComJuros(p, hoje))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        return new PagamentoInfo(aPagar, proxima, total);
     }
 
-    private String pagarParcela(Long idEmprestimo) {
-        // Buscar as parcelas pendentes ordenadas pela data de vencimento
-        List<Parcela> pendentes = repository.buscarParcelasPendentesOrdenadas(idEmprestimo);
+    public ParcelaDTO proximaParcelaPendente(Long idEmprestimo) {
+        PagamentoInfo info = calcularDadosPagamentoAcumulado(idEmprestimo);
+        Parcela p = info.proxima;
+        return new ParcelaDTO(
+                p.getNumeroParcela(),
+                p.getDataVencimento(),
+                info.total,
+                p.getPaga(),
+                p.getDataPagamento()
+        );
+    }
+
+    @Transactional
+    public String pagarParcela(Long idEmprestimo) {
+        emprestimoRepository.findById(idEmprestimo)
+                .orElseThrow(() -> new IllegalArgumentException("Empréstimo não encontrado"));
+
+        PagamentoInfo info = calcularDadosPagamentoAcumulado(idEmprestimo);
+        LocalDate hoje = LocalDate.now();
+
+        info.parcelas.forEach(p -> {
+            p.setPaga(true);
+            p.setDataPagamento(hoje);
+        });
+        repository.saveAll(info.parcelas);
+
+        return String.format("Pagamento efetuado com sucesso. Valor total pago: R$ %.2f", info.total);
+    }
+
+    @Transactional
+    public String anteciparParcelas(Long idEmprestimo, Integer quantidade) {
+        emprestimoRepository.findById(idEmprestimo)
+                .orElseThrow(() -> new IllegalArgumentException("Empréstimo não encontrado"));
 
         LocalDate hoje = LocalDate.now();
-        int mesAtual = hoje.getMonthValue();
-        int anoAtual = hoje.getYear();
-
-        Parcela parcelaDoMes = pendentes.stream()
-            .filter(p -> p.getDataVencimento().getMonthValue() == mesAtual &&
-                         p.getDataVencimento().getYear() == anoAtual)
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Nenhuma parcela disponível para pagamento neste mês."));
-
-        parcelaDoMes.setPaga(true);
-        repository.save(parcelaDoMes);
-
-        return "Parcela com vencimento em " + parcelaDoMes.getDataVencimento() + " paga com sucesso.";
-    }
-
-    private String anteciparParcelas(Long idEmprestimo, Integer numeroParcelas) {
         List<Parcela> pendentes = repository.buscarParcelasPendentesOrdenadas(idEmprestimo);
 
-        // Verifica se o número de parcelas a ser antecipado é válido
-        if (pendentes.size() < numeroParcelas) {
-            throw new IllegalArgumentException("Não há parcelas suficientes para antecipar.");
+        boolean temAtraso = pendentes.stream()
+                .anyMatch(p -> p.getDataVencimento().isBefore(hoje));
+        if (temAtraso) {
+            throw new IllegalArgumentException(
+                    "Não é possível antecipar: existem parcelas vencidas. Pague-as primeiro.");
         }
 
-        BigDecimal totalPago = BigDecimal.ZERO;
-        for (int i = 0; i < numeroParcelas; i++) {
-            Parcela parcela = pendentes.get(i);
-
-            if (parcela.getPaga()) {
-                continue;
-            }
-
-            parcela.setPaga(true);
-            totalPago = totalPago.add(parcela.getValor());
-
-            repository.save(parcela);
+        if (quantidade <= 0 || pendentes.size() < quantidade) {
+            throw new IllegalArgumentException("Quantidade inválida para antecipação.");
         }
 
-        return "Parcelas antecipadas com sucesso. Total pago: " + totalPago;
+        List<Parcela> selecionadas = pendentes.subList(0, quantidade);
+        BigDecimal total = selecionadas.stream()
+                .map(p -> p.getValor().setScale(2, RoundingMode.HALF_UP))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        selecionadas.forEach(p -> {
+            p.setPaga(true);
+            p.setDataPagamento(hoje);
+        });
+        repository.saveAll(selecionadas);
+
+        return String.format("Parcelas antecipadas com sucesso. Total pago: R$ %.2f", total);
+    }
+
+    private BigDecimal calcularValorComJuros(Parcela parcela, LocalDate hoje) {
+        BigDecimal valor = parcela.getValor().setScale(2, RoundingMode.HALF_UP);
+        long diasAtraso = ChronoUnit.DAYS.between(parcela.getDataVencimento(), hoje);
+        if (diasAtraso > 0) {
+            BigDecimal juros = valor
+                    .multiply(TAXA_JUROS_DIARIA)
+                    .multiply(BigDecimal.valueOf(diasAtraso))
+                    .setScale(2, RoundingMode.HALF_UP);
+            return valor.add(juros);
+        }
+        return valor;
     }
 }

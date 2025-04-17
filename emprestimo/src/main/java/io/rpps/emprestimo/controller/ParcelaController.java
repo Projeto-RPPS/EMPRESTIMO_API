@@ -37,10 +37,22 @@ public class ParcelaController {
                 .toList());
     }
 
+    @GetMapping("/{idEmprestimo}/parcelas/proximaPendente")
+    public ResponseEntity<ParcelaDTO> buscarProximaParcelaPendente(@PathVariable Long idEmprestimo) {
+        ParcelaDTO dto = service.proximaParcelaPendente(idEmprestimo);
+        return ResponseEntity.ok(dto);
+    }
+
     @PostMapping("/{idEmprestimo}/parcelas/pagar")
-    public ResponseEntity<PagamentoResponseDTO> pagarParcela(@PathVariable Long idEmprestimo,
-                                                             @RequestParam(required = false) Integer numeroParcela) {
-        String mensagem = service.pagarOuAnteciparParcelas(idEmprestimo, numeroParcela);
-        return ResponseEntity.ok(new PagamentoResponseDTO(mensagem));
+    public ResponseEntity<PagamentoResponseDTO> pagarParcela(@PathVariable Long idEmprestimo) {
+        String msg = service.pagarParcela(idEmprestimo);
+        return ResponseEntity.ok(new PagamentoResponseDTO(msg));
+    }
+
+    @PostMapping("/{idEmprestimo}/parcelas/antecipar")
+    public ResponseEntity<PagamentoResponseDTO> anteciparParcela(@PathVariable Long idEmprestimo,
+                                                                 @RequestParam Integer quantidadeParcelas) {
+        String msg = service.anteciparParcelas(idEmprestimo, quantidadeParcelas);
+        return ResponseEntity.ok(new PagamentoResponseDTO(msg));
     }
 }

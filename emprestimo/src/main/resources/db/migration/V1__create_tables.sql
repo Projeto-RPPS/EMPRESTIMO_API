@@ -15,6 +15,7 @@ CREATE TABLE parcela (
     id_emprestimo BIGINT NOT NULL,
     numero_parcela INTEGER NOT NULL,
     data_vencimento DATE NOT NULL,
+    data_pagamento DATE,
     valor DECIMAL(10,2) NOT NULL,
     paga BOOLEAN DEFAULT FALSE,
     CONSTRAINT fk_emprestimo FOREIGN KEY (id_emprestimo) REFERENCES emprestimo(id) ON DELETE CASCADE

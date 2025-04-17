@@ -31,6 +31,9 @@ public class Parcela {
     @Column(name = "paga", nullable = false)
     private Boolean paga;
 
+    @Column(name = "data_pagamento")
+    private LocalDate dataPagamento;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_emprestimo")
     private Emprestimo emprestimo;

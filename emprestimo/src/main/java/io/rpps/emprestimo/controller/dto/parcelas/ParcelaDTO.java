@@ -6,5 +6,6 @@ import java.time.LocalDate;
 public record ParcelaDTO(Integer numeroParcela,
                          LocalDate dataVencimento,
                          BigDecimal valor,
-                         Boolean paga) {
+                         Boolean paga,
+                         LocalDate dataPagamento) {
 }

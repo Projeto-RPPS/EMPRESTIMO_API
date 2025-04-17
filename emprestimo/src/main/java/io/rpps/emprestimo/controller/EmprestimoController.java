@@ -56,7 +56,6 @@ public class EmprestimoController {
     public ResponseEntity<List<EmprestimoResumoDTO>> consultarEmprestimosPorCpf(@PathVariable String cpfContribuinte) {
         List<Emprestimo> response = service.consultarEmprestimoPorCpf(cpfContribuinte);
 
-        // Retorna a lista de empréstimos com status 200
         return ResponseEntity.ok(response
                 .stream()
                 .map(mapper::toResumoDTO)
