@@ -1,12 +1,11 @@
 package io.rpps.emprestimo.repository;
 
 import io.rpps.emprestimo.model.Parcela;
+import io.rpps.emprestimo.model.StatusEmprestimo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ParcelasRepository extends JpaRepository<Parcela, Long> {
 
@@ -20,4 +19,8 @@ public interface ParcelasRepository extends JpaRepository<Parcela, Long> {
             """)
     List<Parcela> buscarParcelasPendentesOrdenadas(Long idEmprestimo);
 
+    List<Parcela> findByEmprestimo_CpfContribuinteAndEmprestimo_StatusAndPagaFalse(
+            String cpfContribuinte,
+            StatusEmprestimo status
+    );
 }

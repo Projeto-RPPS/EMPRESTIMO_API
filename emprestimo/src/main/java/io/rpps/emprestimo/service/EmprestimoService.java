@@ -1,7 +1,6 @@
 package io.rpps.emprestimo.service;
 
 import io.rpps.emprestimo.controller.dto.emprestimo.EmprestimoRequestDTO;
-import io.rpps.emprestimo.controller.dto.emprestimo.EmprestimoResumoDTO;
 import io.rpps.emprestimo.controller.dto.emprestimo.SimularEmprestimoDTO;
 import io.rpps.emprestimo.controller.mappers.EmprestimoMapper;
 import io.rpps.emprestimo.model.Emprestimo;
@@ -25,6 +24,8 @@ public class EmprestimoService {
     private final ParcelaService parcelaService;
     private final MargemConsignavelService margemConsignavelService;
     private final BeneficioValidator validator;
+    private final BigDecimal VALOR_JUROS = BigDecimal.valueOf(0.02);
+
 
     private BigDecimal calcularNovaParcela(BigDecimal valorTotal, Integer quantidadeParcelas){
         return valorTotal.divide(
@@ -32,9 +33,8 @@ public class EmprestimoService {
     }
 
     private BigDecimal aplicarJuros(BigDecimal valorPrincipal, int quantidadeParcelas) {
-        BigDecimal taxaJurosMensal = new BigDecimal("0.05"); // 5% ao mês
         BigDecimal jurosTotais = valorPrincipal
-                .multiply(taxaJurosMensal)
+                .multiply(VALOR_JUROS)
                 .multiply(BigDecimal.valueOf(quantidadeParcelas));
 
         return valorPrincipal.add(jurosTotais);

@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,18 +21,25 @@ public class MargemConsignavelService {
     private final ParcelasRepository parcelasRepository;
     private final BeneficioValidator validator;
 
-    public MargemConsignavelDTO calcularMargem(String cpfContribuinte){
+    public MargemConsignavelDTO calcularMargem(String cpfContribuinte) {
         validator.validarCpf(cpfContribuinte);
+
         var beneficio = beneficioService.getBeneficio(cpfContribuinte);
         validator.validarBeneficioAtivo(beneficio);
-        BigDecimal margemTotal = beneficio.totalBeneficios().multiply(BigDecimal.valueOf(0.3));
+        BigDecimal margemTotal = beneficio.totalBeneficios()
+                .multiply(BigDecimal.valueOf(0.3));
 
-        BigDecimal valorEmUso = parcelasRepository
-                .findAll()
-                .stream()
-                .filter(p -> p.getEmprestimo().getCpfContribuinte().equals(cpfContribuinte))
-                .filter(p -> p.getEmprestimo().getStatus() == StatusEmprestimo.APROVADO && !p.getPaga())
-                .map(Parcela::getValor)
+        List<Parcela> parcelasPendentes = parcelasRepository
+                .findByEmprestimo_CpfContribuinteAndEmprestimo_StatusAndPagaFalse(
+                        cpfContribuinte, StatusEmprestimo.APROVADO);
+
+        BigDecimal valorEmUso = parcelasPendentes.stream()
+                .collect(Collectors.toMap(
+                        parcela -> parcela.getEmprestimo().getId(),
+                        Parcela::getValor,
+                        (valorExistente, novoValor) -> valorExistente
+                ))
+                .values().stream()
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal margemDisponivel = margemTotal.subtract(valorEmUso);
@@ -40,6 +49,6 @@ public class MargemConsignavelService {
                 margemTotal,
                 valorEmUso,
                 margemDisponivel
-                );
+        );
     }
 }
