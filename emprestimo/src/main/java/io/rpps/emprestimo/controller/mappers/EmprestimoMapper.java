@@ -33,7 +33,7 @@ public interface EmprestimoMapper {
             return BigDecimal.ZERO;
         }
 
-        BigDecimal juros = emprestimo.getValorTotal().multiply(BigDecimal.valueOf(0.05));
+        BigDecimal juros = emprestimo.getValorTotal().multiply(BigDecimal.valueOf(0.02));
         BigDecimal jurosTotal = juros.multiply(BigDecimal.valueOf(emprestimo.getQuantidadeParcelas()));
         BigDecimal valorTotalComJuros = emprestimo.getValorTotal().add(jurosTotal);
         BigDecimal valorParcela = valorTotalComJuros.divide(BigDecimal.valueOf(
