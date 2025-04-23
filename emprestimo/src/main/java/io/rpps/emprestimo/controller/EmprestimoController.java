@@ -32,9 +32,7 @@ public class EmprestimoController {
             @ApiResponse(responseCode = "200", description = "Empréstimo aprovado",
                     content = @Content(schema = @Schema(implementation = EmprestimoAprovadoDTO.class))),
             @ApiResponse(responseCode = "422", description = "Empréstimo rejeitado",
-                    content = @Content(schema = @Schema(implementation = EmprestimoRejeitadoDTO.class))),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
-                    content = @Content)
+                    content = @Content(schema = @Schema(implementation = EmprestimoRejeitadoDTO.class)))
     })
     public ResponseEntity<Object> criar(@RequestBody @Valid EmprestimoRequestDTO dto) {
         Object response = service.criarEmprestimo(dto);
@@ -42,14 +40,12 @@ public class EmprestimoController {
         if(response instanceof EmprestimoAprovadoDTO aprovado){
             return ResponseEntity.ok(aprovado);
         }
-        if(response instanceof EmprestimoRejeitadoDTO rejeitado){
-            return ResponseEntity
+        
+        EmprestimoRejeitadoDTO rejeitado = (EmprestimoRejeitadoDTO) response;
+        return ResponseEntity
                     .status(HttpStatus.UNPROCESSABLE_ENTITY)
                     .body(rejeitado);
-        }
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .build();
+        
     }
 
     @GetMapping("/{cpfContribuinte}")
