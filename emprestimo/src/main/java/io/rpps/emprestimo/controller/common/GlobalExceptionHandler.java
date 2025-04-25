@@ -3,6 +3,8 @@ package io.rpps.emprestimo.controller.common;
 import io.rpps.emprestimo.controller.dto.erros.ErroCampo;
 import io.rpps.emprestimo.controller.dto.erros.ErroResposta;
 import io.rpps.emprestimo.controller.dto.parcelas.PagamentoResponseDTO;
+import io.rpps.emprestimo.exceptions.BusinessException;
+import io.rpps.emprestimo.exceptions.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.dao.DataAccessException;
@@ -39,6 +41,18 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErroResposta handleIllegalArgumentException(IllegalArgumentException e) {
         return ErroResposta.CampoInvalido(e.getMessage());
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErroResposta handleResourceNotFoundException(ResourceNotFoundException e) {
+        return ErroResposta.OperacaoNaoEncontrada(e.getMessage());
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public ErroResposta handleBusinessException(BusinessException e) {
+        return ErroResposta.OperacaoNaoPermitidaBusiness(e.getMessage());
     }
 
     @ExceptionHandler(RestClientException.class)

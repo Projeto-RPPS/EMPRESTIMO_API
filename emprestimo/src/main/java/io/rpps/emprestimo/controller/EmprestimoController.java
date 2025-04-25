@@ -31,7 +31,7 @@ public class EmprestimoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Empréstimo aprovado",
                     content = @Content(schema = @Schema(implementation = EmprestimoAprovadoDTO.class))),
-            @ApiResponse(responseCode = "422", description = "Empréstimo rejeitado",
+            @ApiResponse(responseCode = "200", description = "Empréstimo rejeitado",
                     content = @Content(schema = @Schema(implementation = EmprestimoRejeitadoDTO.class)))
     })
     public ResponseEntity<Object> criar(@RequestBody @Valid EmprestimoRequestDTO dto) {
@@ -42,9 +42,7 @@ public class EmprestimoController {
         }
         
         EmprestimoRejeitadoDTO rejeitado = (EmprestimoRejeitadoDTO) response;
-        return ResponseEntity
-                    .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                    .body(rejeitado);
+        return ResponseEntity.ok(rejeitado);
         
     }
 

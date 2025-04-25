@@ -3,6 +3,7 @@ package io.rpps.emprestimo.service;
 import io.rpps.emprestimo.controller.dto.emprestimo.EmprestimoRequestDTO;
 import io.rpps.emprestimo.controller.dto.emprestimo.SimularEmprestimoDTO;
 import io.rpps.emprestimo.controller.mappers.EmprestimoMapper;
+import io.rpps.emprestimo.exceptions.ResourceNotFoundException;
 import io.rpps.emprestimo.model.Emprestimo;
 import io.rpps.emprestimo.model.StatusEmprestimo;
 import io.rpps.emprestimo.repository.EmprestimoRepository;
@@ -67,7 +68,7 @@ public class EmprestimoService {
         List<Emprestimo> emprestimos = repository.consultarPorCpf(cpfContribuinte);
 
         if (emprestimos.isEmpty()) {
-            throw new IllegalArgumentException("Empréstimos não encontrados para este CPF");
+            throw new ResourceNotFoundException("Empréstimos não encontrados para este CPF");
         }
 
         return emprestimos;

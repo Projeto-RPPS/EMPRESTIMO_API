@@ -1,6 +1,8 @@
 package io.rpps.emprestimo.service;
 
 import io.rpps.emprestimo.controller.dto.parcelas.ParcelaDTO;
+import io.rpps.emprestimo.exceptions.BusinessException;
+import io.rpps.emprestimo.exceptions.ResourceNotFoundException;
 import io.rpps.emprestimo.model.Emprestimo;
 import io.rpps.emprestimo.model.Parcela;
 import io.rpps.emprestimo.repository.EmprestimoRepository;
@@ -41,7 +43,7 @@ public class ParcelaService {
     public List<Parcela> buscarPorEmprestimo(Long idEmprestimo){
         Emprestimo emprestimo = emprestimoRepository.findById(idEmprestimo)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Empréstimo não encontrado com este ID"));
+                        new ResourceNotFoundException("Empréstimo não encontrado com este ID"));
         return repository.findByEmprestimoId(emprestimo.getId());
     }
 
@@ -51,7 +53,7 @@ public class ParcelaService {
         LocalDate hoje = LocalDate.now();
         List<Parcela> pendentes = repository.buscarParcelasPendentesOrdenadas(idEmprestimo);
         if (pendentes.isEmpty()){
-            throw new IllegalArgumentException("Não há parcelas pendentes para este empréstimo.");
+            throw new BusinessException("Não há parcelas pendentes para este empréstimo.");
         }
 
         List<Parcela> vencidas = pendentes.stream()
@@ -76,6 +78,9 @@ public class ParcelaService {
     }
 
     public ParcelaDTO proximaParcelaPendente(Long idEmprestimo) {
+        emprestimoRepository.findById(idEmprestimo)
+                .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado"));
+
         PagamentoInfo info = calcularDadosPagamentoAcumulado(idEmprestimo);
         Parcela p = info.proxima;
         return new ParcelaDTO(
@@ -90,7 +95,7 @@ public class ParcelaService {
     @Transactional
     public String pagarParcela(Long idEmprestimo) {
         emprestimoRepository.findById(idEmprestimo)
-                .orElseThrow(() -> new IllegalArgumentException("Empréstimo não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado"));
 
         PagamentoInfo info = calcularDadosPagamentoAcumulado(idEmprestimo);
         LocalDate hoje = LocalDate.now();
@@ -107,7 +112,7 @@ public class ParcelaService {
     @Transactional
     public String anteciparParcelas(Long idEmprestimo, Integer quantidade) {
         emprestimoRepository.findById(idEmprestimo)
-                .orElseThrow(() -> new IllegalArgumentException("Empréstimo não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado"));
 
         LocalDate hoje = LocalDate.now();
         List<Parcela> pendentes = repository.buscarParcelasPendentesOrdenadas(idEmprestimo);
@@ -115,12 +120,12 @@ public class ParcelaService {
         boolean temAtraso = pendentes.stream()
                 .anyMatch(p -> p.getDataVencimento().isBefore(hoje));
         if (temAtraso) {
-            throw new IllegalArgumentException(
+            throw new BusinessException(
                     "Não é possível antecipar: existem parcelas vencidas. Pague-as primeiro.");
         }
 
         if (quantidade <= 0 || pendentes.size() < quantidade) {
-            throw new IllegalArgumentException("Quantidade inválida para antecipação.");
+            throw new BusinessException("Quantidade inválida para antecipação.");
         }
 
         List<Parcela> selecionadas = pendentes.subList(0, quantidade);
