@@ -10,6 +10,7 @@ public record EmprestimoRequestDTO(@NotBlank(message = "campo obrigatório")
                                    @Size(min = 11, message = "O CPF deve ter exatamente 11 digitos.")
                                    String  cpfContribuinte,
                                    @NotNull(message = "campo obrigatório")
+                                   @Min(value = 1, message = "O valor do empréstimo deve ser maior que zero")
                                    BigDecimal valorTotal,
                                    @NotNull(message = "campo obrigatório")
                                    @Min(value = 1, message = "A quantidade de parcelas deve ser maior que zero")
